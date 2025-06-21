@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1>Bem-vindo ao CRM Escolar</h1>
+    <p class="lead">Use o menu acima para acessar o Kanban, os Leads ou os Relatórios.</p>
+
+    <div class="mt-4">
+        <a href="{% url 'lead_kanban' %}" class="btn btn-primary me-2">Ver Kanban</a>
+        <a href="{% url 'lead_list' %}" class="btn btn-secondary me-2">Lista de Leads</a>
+        <a href="{% url 'lead_report' %}" class="btn btn-info">Relatórios</a>
+    </div>
+</div>
+{% endblock %}

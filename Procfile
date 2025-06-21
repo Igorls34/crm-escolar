@@ -1,0 +1,1 @@
+web: gunicorn crm_escolar.wsgi --log-file -

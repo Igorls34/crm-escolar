@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">📊 Relatório Geral de Leads</h4>
+    </div>
+
+    <div class="card-body">
+        <!-- Informações Rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="alert alert-info text-center">
+                    <strong>Total de Leads:</strong><br>{{ total_leads }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="alert alert-success text-center">
+                    <strong>Taxa de Conversão:</strong><br>{{ taxa_conversao|floatformat:2 }}%
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="alert alert-warning text-center">
+                    <strong>Leads últimos 7 dias:</strong><br>{{ leads_ultimos_7_dias }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="alert alert-secondary text-center">
+                    <strong>Leads últimos 30 dias:</strong><br>{{ leads_ultimo_mes }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h5>Status dos Leads</h5>
+                <canvas id="statusChart"></canvas>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <h5>Leads por Atendente</h5>
+                <canvas id="atendenteChart"></canvas>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h5>Funil de Conversão</h5>
+                <canvas id="funnelChart"></canvas>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <h5>Interesses por Curso</h5>
+                <canvas id="cursoChart"></canvas>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-start mt-4">
+            <a href="{% url 'lead_list' %}" class="btn btn-secondary">← Voltar para Lista</a>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Status
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ status_labels|safe }},
+            datasets: [{
+                label: 'Leads por Status',
+                data: {{ status_data|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: 'y',
+            scales: { x: { beginAtZero: true } },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Gráfico de Atendentes
+    const atendenteCtx = document.getElementById('atendenteChart').getContext('2d');
+    new Chart(atendenteCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ atendente_labels|safe }},
+            datasets: [{
+                data: {{ atendente_data|safe }},
+                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Funil de Conversão
+    const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+    new Chart(funnelCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Leads Gerados', 'Contato Feito', 'Visita Agendada', 'Matriculados'],
+            datasets: [{
+                label: 'Quantidade',
+                data: {{ funil_data|safe }},
+                backgroundColor: ['#6c757d', '#17a2b8', '#ffc107', '#28a745']
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+
+    // Interesses por Curso
+    const cursoCtx = document.getElementById('cursoChart').getContext('2d');
+    new Chart(cursoCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ cursos_labels|safe }},
+            datasets: [{
+                data: {{ cursos_data|safe }},
+                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+</script>
+{% endblock %}
