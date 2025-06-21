@@ -13,6 +13,16 @@ import csv
 from .forms import LeadObservacaoForm
 from .models import LeadObservacao
 from django.db.models import Count
+# MIGRAÇÕES
+from django.http import HttpResponse
+from django.core.management import call_command
+# view de migração
+def run_migrations(request):
+    try:
+        call_command('migrate')
+        return HttpResponse('✅ Migrações aplicadas com sucesso!')
+    except Exception as e:
+        return HttpResponse(f'❌ Erro ao rodar as migrações: {e}')
 
 @login_required
 def lead_list(request):
