@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import run_migrations #url de migração
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,4 +13,5 @@ urlpatterns = [
     path('mover-lead/', views.mover_lead, name='mover_lead'),
     path('exportar-leads/', views.exportar_leads_csv, name='exportar_leads_csv'),
     path('lead/<int:pk>/', views.lead_detail, name='lead_detail'),
+    path('run-migrations/', run_migrations), # url de migração
 ]
