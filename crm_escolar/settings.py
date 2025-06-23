@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -------------------
 # Segurança (produção)
 # -------------------
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fake-for-dev-only')
+SECRET_KEY = os.getenv('SECRET_KEY', '5b5df44c25f6dc1e9202eaa4dc6a706e')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
