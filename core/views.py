@@ -1,22 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Lead
 from django.contrib.auth.decorators import login_required
-from .forms import LeadForm
+from .forms import LeadForm, LeadObservacaoForm
 from django.db.models import Count, Q
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from datetime import datetime
 from django.core.paginator import Paginator
 from django.utils.timezone import now, timedelta
+from django.core.management import call_command
 import json
 import csv
-from .forms import LeadObservacaoForm
-from .models import LeadObservacao
-from django.db.models import Count
-# MIGRAÇÕES
-from django.http import HttpResponse
-from django.core.management import call_command
-# view de migração
+
+# View de migração manual (gambiarra pro Render Free Plan)
 def run_migrations(request):
     try:
         call_command('migrate')
@@ -140,7 +136,7 @@ def lead_report(request):
     cursos_labels = [item['curso_interesse'] for item in cursos_counts]
     cursos_data = [item['total'] for item in cursos_counts]
 
-    # Funil de Conversão (Total de cada etapa)
+    # Funil de Conversão
     funil_data = [
         total_leads,
         Lead.objects.filter(status='contato').count(),
@@ -155,25 +151,42 @@ def lead_report(request):
         'leads_ultimo_mes': leads_ultimo_mes,
         'ultimo_lead': ultimo_lead,
 
-        # Dados por status
         'status_counts': status_counts,
         'status_labels': json.dumps(status_labels),
         'status_data': json.dumps(status_data),
 
-        # Dados por atendente
         'atendente_counts': atendente_counts,
         'atendente_labels': json.dumps(atendente_labels),
         'atendente_data': json.dumps(atendente_data),
 
-        # Dados por curso
         'cursos_labels': json.dumps(cursos_labels),
         'cursos_data': json.dumps(cursos_data),
 
-        # Funil
         'funil_data': json.dumps(funil_data),
     }
 
     return render(request, 'lead_report.html', context)
+
+@login_required
+def dashboard(request):
+    funil_data = [
+        Lead.objects.count(),
+        Lead.objects.filter(status='contato').count(),
+        Lead.objects.filter(status='visita').count(),
+        Lead.objects.filter(status='matricula').count(),
+    ]
+
+    cursos_qs = Lead.objects.values('curso_interesse').annotate(total=Count('id'))
+    cursos_labels = [c['curso_interesse'] for c in cursos_qs]
+    cursos_data = [c['total'] for c in cursos_qs]
+
+    context = {
+        'funil_data': funil_data,
+        'cursos_labels': cursos_labels,
+        'cursos_data': cursos_data,
+    }
+
+    return render(request, 'dashboard.html', context)
 
 @login_required
 def lead_kanban(request):
@@ -294,11 +307,6 @@ def home(request):
 @login_required
 def lead_detail(request, pk):
     lead = get_object_or_404(Lead, pk=pk)
-    return render(request, 'lead_detail.html', {'lead': lead})
-
-@login_required
-def lead_detail(request, pk):
-    lead = get_object_or_404(Lead, pk=pk)
     observacoes = lead.historico_observacoes.order_by('-criado_em')
 
     if request.method == 'POST':
@@ -317,24 +325,3 @@ def lead_detail(request, pk):
         'observacoes': observacoes,
         'form': form
     })
-
-# Funil
-funil_data = [
-    Lead.objects.count(),
-    Lead.objects.filter(status='contato').count(),
-    Lead.objects.filter(status='visita').count(),
-    Lead.objects.filter(status='matricula').count(),
-]
-
-# Cursos
-cursos_qs = Lead.objects.values('curso_interesse').annotate(total=Count('id'))
-cursos_labels = [c['curso_interesse'] for c in cursos_qs]
-cursos_data = [c['total'] for c in cursos_qs]
-
-context = {}  # <- precisa disso antes de usar o context.update()
-
-context.update({
-    'funil_data': funil_data,
-    'cursos_labels': cursos_labels,
-    'cursos_data': cursos_data,
-})
