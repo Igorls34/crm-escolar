@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load form_filters %}
+{% block title %}{% if curso %}Editar Curso{% else %}Novo Curso{% endif %} | CRM Escolar{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-12">
+    <div class="card shadow-lg border-0 rounded-4 mb-4 animate__animated animate__fadeIn">
+      <div class="card-body p-4">
+        <h2 class="mb-4 text-center fw-bold" style="color:#2f3037">
+          {% if curso %}<span class="text-warning">Editar Curso</span>{% else %}Novo Curso{% endif %}
+        </h2>
+        <form method="post" autocomplete="off" novalidate>
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="nome" class="form-label">Nome do Curso</label>
+            <input type="text" name="nome" id="nome"
+              class="form-control form-control-lg rounded-3 {% if form.nome.errors %}is-invalid{% endif %}"
+              placeholder="Digite o nome" value="{{ curso.nome|default_if_none:'' }}" required>
+            {% if form.nome.errors %}
+              <div class="invalid-feedback">{{ form.nome.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="duracao_horas" class="form-label">Duração (horas)</label>
+            <input type="number" name="duracao_horas" id="duracao_horas"
+              class="form-control form-control-lg rounded-3 {% if form.duracao_horas.errors %}is-invalid{% endif %}"
+              placeholder="Ex: 40" value="{{ curso.duracao_horas|default_if_none:'' }}" min="1" required>
+            {% if form.duracao_horas.errors %}
+              <div class="invalid-feedback">{{ form.duracao_horas.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="valor" class="form-label">Valor (R$)</label>
+            <input type="number" name="valor" id="valor"
+              class="form-control form-control-lg rounded-3 {% if form.valor.errors %}is-invalid{% endif %}"
+              step="0.01" placeholder="Ex: 599.00" value="{{ curso.valor|default_if_none:'' }}" min="0" required>
+            {% if form.valor.errors %}
+              <div class="invalid-feedback">{{ form.valor.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="d-flex gap-2 mt-4 justify-content-end">
+            <a href="{% url 'curso_list' %}" class="btn btn-secondary px-4 py-2 rounded-3">Cancelar</a>
+            <button type="submit" class="btn btn-success px-4 py-2 rounded-3">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

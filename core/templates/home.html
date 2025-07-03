@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Início | CRM Escolar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 62vh;">
+  <div class="text-center">
+    <h1 class="fw-bold mb-3" style="color:#2f3037">
+      <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="#F6C700" class="mb-2" viewBox="0 0 24 24">
+        <path d="M7 2v2H3.993C2.892 4 2 4.895 2 6v14c0 1.105.892 2 1.993 2H20.007A1.995 1.995 0 0022 20V6a2 2 0 00-1.993-2H17V2h-2v2H9V2H7zm0 4V4h2v2h6V4h2v2h2.007c.552 0 .993.446.993.993v.26l-8 4.572-8-4.572v-.26C2 4.446 2.446 4 2.993 4H7zm-4 2.37l7.38 4.218c.39.224.85.224 1.24 0L21 6.37V20a1 1 0 01-1 1H4a1 1 0 01-1-1V6.37z"/>
+      </svg>
+      Bem-vindo ao <span class="text-warning">CRM Escolar</span>
+    </h1>
+    <p class="lead mb-4" style="max-width:430px;margin:auto;">
+      Use o menu acima para acessar o Kanban, os Leads ou os Relatórios.<br>
+      Tudo na palma da sua mão, com organização e performance.
+    </p>
+    <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{% url 'lead_kanban' %}" class="btn btn-primary btn-lg px-4 rounded-3 fw-semibold shadow-sm">Ver Kanban</a>
+      <a href="{% url 'lead_list' %}" class="btn btn-secondary btn-lg px-4 rounded-3 fw-semibold shadow-sm">Lista de Leads</a>
+      <a href="{% url 'lead_report' %}" class="btn btn-info btn-lg px-4 rounded-3 fw-semibold shadow-sm">Relatórios</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

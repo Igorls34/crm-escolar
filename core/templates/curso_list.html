@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Cursos | CRM Escolar{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-md-12">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="fw-bold" style="color:#2f3037">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#F6C700" class="me-2" viewBox="0 0 24 24">
+          <path d="M7 2v2H3.993C2.892 4 2 4.895 2 6v14c0 1.105.892 2 1.993 2H20.007A1.995 1.995 0 0022 20V6a2 2 0 00-1.993-2H17V2h-2v2H9V2H7zm0 4V4h2v2h6V4h2v2h2.007c.552 0 .993.446.993.993v.26l-8 4.572-8-4.572v-.26C2 4.446 2.446 4 2.993 4H7zm-4 2.37l7.38 4.218c.39.224.85.224 1.24 0L21 6.37V20a1 1 0 01-1 1H4a1 1 0 01-1-1V6.37z"/>
+        </svg>
+        Cursos
+      </h2>
+      <a href="{% url 'curso_create' %}" class="btn btn-primary px-4 py-2 fw-semibold rounded-3 shadow-sm">
+        + Novo Curso
+      </a>
+    </div>
+    <div class="table-responsive rounded-4 shadow-sm">
+      <table class="table table-hover table-borderless align-middle mb-0">
+        <thead class="table-dark rounded-3">
+          <tr>
+            <th>Nome</th>
+            <th class="text-center">Duração</th>
+            <th class="text-center">Valor</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for curso in cursos %}
+          <tr>
+            <td>{{ curso.nome }}</td>
+            <td class="text-center">{{ curso.duracao_horas }}h</td>
+            <td class="text-center">R$ {{ curso.valor }}</td>
+            <td class="text-end">
+              <a href="{% url 'curso_edit' curso.id %}" class="btn btn-sm btn-warning px-3 rounded-3 me-2">Editar</a>
+              <!-- Botão que abre o modal -->
+              <button class="btn btn-sm btn-outline-danger px-3 rounded-3" 
+                data-bs-toggle="modal" 
+                data-bs-target="#modalExcluirCurso{{ curso.id }}">
+                Excluir
+              </button>
+              <!-- Modal de confirmação -->
+              <div class="modal fade" id="modalExcluirCurso{{ curso.id }}" tabindex="-1" aria-labelledby="modalLabel{{ curso.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content rounded-4">
+                    <div class="modal-header bg-danger text-white rounded-top-4">
+                      <h5 class="modal-title" id="modalLabel{{ curso.id }}">Excluir Curso</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Tem certeza que deseja excluir o curso <strong>{{ curso.nome }}</strong>?</p>
+                      <form method="post" action="{% url 'curso_delete' curso.id %}">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-end mt-3">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-danger">Sim, excluir</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Fim do modal -->
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">Nenhum curso cadastrado ainda.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

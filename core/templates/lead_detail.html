@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Lead | CRM Escolar{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-8 col-md-10">
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+      <div class="card-header bg-info text-white rounded-top-4 d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+          <span class="me-2">👤</span>Detalhes do Lead – <strong>{{ lead.nome_cliente }}</strong>
+        </h4>
+        <a href="{% url 'lead_update' lead.pk %}" class="btn btn-light btn-sm px-3 rounded-3 shadow-sm">
+          ✏️ Editar Lead
+        </a>
+      </div>
+      <div class="card-body py-4">
+        <div class="row gy-2">
+          <div class="col-sm-6"><strong>📞 Telefone:</strong> {{ lead.telefone_cliente }}</div>
+          <div class="col-sm-6"><strong>🎓 Curso de Interesse:</strong> {{ lead.curso_interesse }}</div>
+          <div class="col-sm-6"><strong>🗓️ Início de Atendimento:</strong> {{ lead.data_inicio_atendimento|date:"d/m/Y H:i" }}</div>
+          <div class="col-sm-6"><strong>👤 Atendente:</strong> {{ lead.atendente }}</div>
+          <div class="col-sm-6"><strong>🏷️ Status Atual:</strong> <span class="badge bg-secondary">{{ lead.get_status_display }}</span></div>
+          {% if lead.observacoes %}
+          <div class="col-12 mt-3">
+            <div class="alert alert-warning mb-0 shadow-sm" style="white-space: pre-line;">
+              <strong>📝 Observações gerais do Lead:</strong><br>
+              {{ lead.observacoes }}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+      <div class="card-header bg-secondary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><span class="me-2">📜</span>Histórico de Observações</h5>
+        <button class="btn btn-light btn-sm px-3 rounded-3 shadow-sm" data-bs-toggle="collapse" data-bs-target="#formNovaObs">
+          + Nova Observação
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="collapse mb-4" id="formNovaObs">
+          <form method="post">
+            {% csrf_token %}
+            {{ form.texto }}
+            <button type="submit" class="btn btn-success mt-2">Adicionar Observação</button>
+          </form>
+          <hr>
+        </div>
+        {% if observacoes %}
+          <ul class="list-group list-group-flush">
+            {% for obs in observacoes %}
+              <li class="list-group-item rounded-3 mb-2 bg-light shadow-sm">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="mb-1">{{ obs.texto|linebreaksbr }}</div>
+                    <small class="text-muted">
+                      <span class="me-1">👤</span>{{ obs.criado_por }} |
+                      <span class="me-1">🕑</span>{{ obs.criado_em|date:"d/m/Y H:i" }}
+                    </small>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0">Nenhuma observação registrada ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="text-end">
+      <a href="{% url 'lead_list' %}" class="btn btn-outline-secondary px-4 py-2 rounded-3">← Voltar para a Lista</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

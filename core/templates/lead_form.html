@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}{% if form.instance.pk %}Editar Lead{% else %}Novo Lead{% endif %} | CRM Escolar{% endblock %}
+{% block content %}
+<div class="card shadow-sm mx-auto" style="max-width:800px;">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">{% if form.instance.pk %}Editar Lead{% else %}Novo Lead{% endif %}</h5>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="id_nome_cliente" class="form-label">Nome do Cliente</label>
+          {{ form.nome_cliente }}
+          {% if form.nome_cliente.errors %}<div class="text-danger">{{ form.nome_cliente.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label for="id_telefone_cliente" class="form-label">Telefone</label>
+          {{ form.telefone_cliente }}
+          {% if form.telefone_cliente.errors %}<div class="text-danger">{{ form.telefone_cliente.errors }}</div>{% endif %}
+        </div>
+
+        <!-- Cursos de Interesse with Modal and Selected Cards -->
+        <div class="col-12">
+          <label class="form-label">Cursos de Interesse</label><br>
+          <button type="button" class="btn btn-outline-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#cursosModal">
+            + Selecionar Cursos
+          </button>
+          <div id="selected-cursos" class="d-flex flex-wrap gap-2 mb-3"></div>
+          {% if form.cursos_interesse.errors %}
+          <div class="text-danger">{{ form.cursos_interesse.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label for="id_status" class="form-label">Status</label>
+          {{ form.status }}
+          {% if form.status.errors %}<div class="text-danger">{{ form.status.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label for="id_data_inicio_atendimento" class="form-label">Início do Atendimento</label>
+          {{ form.data_inicio_atendimento }}
+          {% if form.data_inicio_atendimento.errors %}<div class="text-danger">{{ form.data_inicio_atendimento.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-2">
+            {{ form.ad_whats }}
+            <label class="form-check-label" for="id_ad_whats">Adicionado no WhatsApp?</label>
+          </div>
+          {% if form.ad_whats.errors %}<div class="text-danger">{{ form.ad_whats.errors }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+          <label for="id_observacoes" class="form-label">Observações</label>
+          {{ form.observacoes }}
+          {% if form.observacoes.errors %}<div class="text-danger">{{ form.observacoes.errors }}</div>{% endif %}
+        </div>
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-success">Salvar</button>
+        </div>
+      </div>
+      <!-- Modal de Cursos -->
+  <div class="modal fade" id="cursosModal" tabindex="-1" aria-labelledby="cursosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cursosModalLabel">Selecione os Cursos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          {% for checkbox in form.cursos_interesse %}
+            <div class="form-check">
+              {{ checkbox.tag }}
+              <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="saveCursos" class="btn btn-primary">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+  </div>
+</div>
+
+<!-- Modal de Cursos -->
+<div class="modal fade" id="cursosModal" tabindex="-1" aria-labelledby="cursosModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cursosModalLabel">Selecione os Cursos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        {% for checkbox in form.cursos_interesse %}
+        <div class="form-check">
+          {{ checkbox.tag }}
+          <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" id="saveCursos" class="btn btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const modalEl = document.getElementById('cursosModal');
+  const saveBtn = document.getElementById('saveCursos');
+  const selectedDiv = document.getElementById('selected-cursos');
+
+  function updateSelectedCursos(){
+    selectedDiv.innerHTML = '';
+    modalEl.querySelectorAll('input[name="cursos_interesse"]').forEach(cb => {
+      if(cb.checked){
+        const label = modalEl.querySelector(`label[for="${cb.id}"]`).innerText;
+        const card = document.createElement('div');
+        card.className = 'card p-2 bg-light rounded';
+        card.innerHTML = `<span>${label}</span> <span class=\"ms-2 text-danger remove-curso\" data-value=\"${cb.value}\" style=\"cursor:pointer;\">&times;</span>`;
+        selectedDiv.appendChild(card);
+      }
+    });
+  }
+
+  saveBtn.addEventListener('click', function(){
+    updateSelectedCursos();
+    bootstrap.Modal.getInstance(modalEl).hide();
+  });
+
+  selectedDiv.addEventListener('click', function(e){
+    if(e.target.classList.contains('remove-curso')){
+      const val = e.target.getAttribute('data-value');
+      const cb = modalEl.querySelector(`input[name="cursos_interesse"][value="${val}"]`);
+      if(cb){ cb.checked = false; updateSelectedCursos(); }
+    }
+  });
+
+  updateSelectedCursos();
+});
+</script>
+
+<style>
+  #selected-cursos .card { min-width:120px; margin-bottom:5px; }
+</style>
+{% endblock %}

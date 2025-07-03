@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">📋 Lista de Leads ({{ page_obj.paginator.count }} total)</h4>
+        <div>
+            <a href="{% url 'lead_create' %}" class="btn btn-success btn-sm">+ Novo Lead</a>
+            <a href="{% url 'exportar_leads_csv' %}?status={{ status_filter }}&atendente={{ atendente_filter }}&data_inicial={{ data_inicial }}&data_final={{ data_final }}&busca={{ busca }}" class="btn btn-outline-light btn-sm">⬇️ Exportar CSV</a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Filtro -->
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="todos">Status: Todos</option>
+                    <option value="lead_novo" {% if status_filter == 'lead_novo' %}selected{% endif %}>Lead Novo</option>
+                    <option value="contato" {% if status_filter == 'contato' %}selected{% endif %}>Contato Feito</option>
+                    <option value="visita" {% if status_filter == 'visita' %}selected{% endif %}>Visita Agendada</option>
+                    <option value="matricula" {% if status_filter == 'matricula' %}selected{% endif %}>Matriculado</option>
+                    <option value="perdido" {% if status_filter == 'perdido' %}selected{% endif %}>Perdido</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select name="atendente" class="form-select">
+                    <option value="todos">Atendente: Todos</option>
+                    {% for atendente in atendentes %}
+                        {% if atendente %}
+                            <option value="{{ atendente }}" {% if atendente_filter == atendente %}selected{% endif %}>{{ atendente }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <input type="date" name="data_inicial" class="form-control" placeholder="Data Inicial" value="{{ data_inicial }}">
+            </div>
+
+            <div class="col-md-2">
+                <input type="date" name="data_final" class="form-control" placeholder="Data Final" value="{{ data_final }}">
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" name="busca" placeholder="🔎 Nome ou Telefone" class="form-control" value="{{ busca }}">
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+
+        <!-- Lista -->
+        <table class="table table-hover table-striped small">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Status</th>
+                    <th>Atendente</th>
+                    <th>Cursos</th>    <!-- nova coluna -->
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for lead in page_obj %}
+                <tr>
+                    <td>{{ lead.id }}</td>
+                    <td>{{ lead.nome_cliente }}</td>
+                    <td>{{ lead.telefone_cliente }}</td>
+                    <td>{{ lead.get_status_display }}</td>
+                    <td>{{ lead.atendente.username }}</td>
+                    <td>
+                    {% for curso in lead.cursos_interesse.all %}
+                        {{ curso.nome }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        — 
+                    {% endfor %}
+                    </td>
+                    <td class="d-flex gap-1">
+                        <a href="{% url 'lead_detail' lead.pk %}" class="btn btn-outline-secondary btn-sm">🔍 Detalhes</a>
+                        <a href="{% url 'lead_update' lead.pk %}" class="btn btn-outline-primary btn-sm">✏️ Editar</a>
+                        <a href="{% url 'lead_delete' lead.pk %}" class="btn btn-outline-danger btn-sm">🗑️ Excluir</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted">Nenhum lead encontrado com os filtros atuais.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Paginação -->
+        <nav aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if atendente_filter %}&atendente={{ atendente_filter }}{% endif %}{% if busca %}&busca={{ busca }}{% endif %}{% if data_inicial %}&data_inicial={{ data_inicial }}{% endif %}{% if data_final %}&data_final={{ data_final }}{% endif %}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if atendente_filter %}&atendente={{ atendente_filter }}{% endif %}{% if busca %}&busca={{ busca }}{% endif %}{% if data_inicial %}&data_inicial={{ data_inicial }}{% endif %}{% if data_final %}&data_final={{ data_final }}{% endif %}">Próxima</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
