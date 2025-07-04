@@ -12,7 +12,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', '5b5df44c25f6dc1e9202eaa4dc6a706e')
 # DEBUG via variável de ambiente; padrão False
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 # ALLOWED_HOSTS via variável de ambiente, separado por vírgulas
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'igor12356.pythonanywhere.com').split(',')
 
 # -------------------
 # Apps instalados
@@ -111,3 +112,7 @@ LOGIN_REDIRECT_URL = '/leads/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DJANGO_SUPERUSER_USERNAME = os.getenv('DJANGO_SUPERUSER_USERNAME', 'igor12356')
+DJANGO_SUPERUSER_EMAIL    = os.getenv('DJANGO_SUPERUSER_EMAIL',    'igorlaurindo49@gmail.com')
+DJANGO_SUPERUSER_PASSWORD = os.getenv('DJANGO_SUPERUSER_PASSWORD', '123')
