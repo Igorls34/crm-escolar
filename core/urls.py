@@ -1,7 +1,10 @@
 from django.urls import path
 from . import views
 from .views import run_migrations #url de migração
+<<<<<<< HEAD
 from django.http import HttpResponse
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -15,6 +18,7 @@ urlpatterns = [
     path('exportar-leads/', views.exportar_leads_csv, name='exportar_leads_csv'),
     path('lead/<int:pk>/', views.lead_detail, name='lead_detail'),
     path('run-migrations/', run_migrations), # url de migração
+<<<<<<< HEAD
     path('webhook-sheets/', views.webhook_google_sheets, name='webhook_google_sheets'),
     path('usuarios/', views.user_admin, name='user_admin'),
     path('debug/', lambda request: HttpResponse('Funcionando!')),
@@ -24,4 +28,6 @@ urlpatterns = [
     path('cursos/novo/', views.curso_create, name='curso_create'),
     path('cursos/<int:curso_id>/editar/', views.curso_edit, name='curso_edit'),
     path('cursos/<int:pk>/excluir/', views.curso_delete, name='curso_delete'),
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 ]

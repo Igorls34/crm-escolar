@@ -7,13 +7,18 @@ class Lead(models.Model):
         ('contato', 'Contato Feito'),
         ('visita', 'Visita Agendada'),
         ('matricula', 'Matriculado'),
+<<<<<<< HEAD
         ('perdido', 'Perdi do'),
         ("VISITA_AGENDADA_COMPARECEU", "Visita Agendada - Compareceu"),
         ("VISITA_AGENDADA_FALTOU", "Visita Agendada - Faltou"),
+=======
+        ('perdido', 'Perdido'),
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     ]
 
     nome_cliente = models.CharField(max_length=100)
     telefone_cliente = models.CharField(max_length=20)
+<<<<<<< HEAD
     cursos_interesse = models.ManyToManyField('Curso', blank=True)
     data_cadastro = models.DateTimeField(auto_now_add=True)
     data_inicio_atendimento = models.DateTimeField(null=True, blank=True)
@@ -21,6 +26,14 @@ class Lead(models.Model):
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='lead_novo')
     observacoes = models.TextField(blank=True, null=True)
     ad_whats = models.BooleanField('Adicionado no WhatsApp', default=False)
+=======
+    curso_interesse = models.CharField(max_length=100)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
+    data_inicio_atendimento = models.DateTimeField(null=True, blank=True)
+    atendente = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='lead_novo')
+    observacoes = models.TextField(blank=True, null=True)
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 
     def __str__(self):
         return f"{self.nome_cliente} - {self.status}"
@@ -34,6 +47,7 @@ class LeadObservacao(models.Model):
     def __str__(self):
         return f'Observação de {self.criado_por} em {self.criado_em.strftime("%d/%m/%Y %H:%M")}'
 
+<<<<<<< HEAD
 class Curso(models.Model):
     nome = models.CharField(max_length=100, unique=True)
     duracao_horas = models.PositiveIntegerField("Duração (horas)")
@@ -42,4 +56,6 @@ class Curso(models.Model):
     def __str__(self):
         return f"{self.nome} ({self.duracao_horas}h) - R$ {self.valor:.2f}"
 
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 

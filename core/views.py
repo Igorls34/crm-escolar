@@ -11,6 +11,7 @@ from django.utils.timezone import now, timedelta
 from django.core.management import call_command
 import json
 import csv
+<<<<<<< HEAD
 from .sheets_service import salvar_lead_na_planilha
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
@@ -19,6 +20,8 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from .sheets_service import salvar_lead_na_planilha, excluir_lead_na_planilha
 from .sheets_service import editar_lead_na_planilha
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 
 # View de migração manual (gambiarra pro Render Free Plan)
 def run_migrations(request):
@@ -88,8 +91,11 @@ def lead_create(request):
             lead = form.save(commit=False)
             lead.atendente = request.user
             lead.save()
+<<<<<<< HEAD
             form.save_m2m()
             salvar_lead_na_planilha(lead)
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
             return redirect('lead_list')
     else:
         form = LeadForm()
@@ -104,8 +110,11 @@ def lead_update(request, pk):
             lead = form.save(commit=False)
             lead.atendente = request.user
             lead.save()
+<<<<<<< HEAD
             form.save_m2m()
             salvar_lead_na_planilha(lead)
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
             return redirect('lead_list')
     else:
         form = LeadForm(instance=lead)
@@ -115,7 +124,10 @@ def lead_update(request, pk):
 def lead_delete(request, pk):
     lead = get_object_or_404(Lead, pk=pk)
     if request.method == 'POST':
+<<<<<<< HEAD
         excluir_lead_na_planilha(lead.id)
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
         lead.delete()
         return redirect('lead_list')
     return render(request, 'lead_confirm_delete.html', {'lead': lead})
@@ -145,8 +157,13 @@ def lead_report(request):
     atendente_data = [item['total'] for item in atendente_counts]
 
     # Contagem por Curso de Interesse
+<<<<<<< HEAD
     cursos_counts = Lead.objects.values('cursos_interesse__nome').annotate(total=Count('id'))
     cursos_labels = [item['cursos_interesse__nome'] or 'Não informado' for item in cursos_counts]
+=======
+    cursos_counts = Lead.objects.values('curso_interesse').annotate(total=Count('id'))
+    cursos_labels = [item['curso_interesse'] for item in cursos_counts]
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     cursos_data = [item['total'] for item in cursos_counts]
 
     # Funil de Conversão
@@ -189,8 +206,13 @@ def dashboard(request):
         Lead.objects.filter(status='matricula').count(),
     ]
 
+<<<<<<< HEAD
     cursos_qs = Lead.objects.values('cursos_interesse__nome').annotate(total=Count('id'))
     cursos_labels = [c['cursos_interesse__nome'] or 'Não informado' for c in cursos_qs]
+=======
+    cursos_qs = Lead.objects.values('curso_interesse').annotate(total=Count('id'))
+    cursos_labels = [c['curso_interesse'] for c in cursos_qs]
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     cursos_data = [c['total'] for c in cursos_qs]
 
     context = {
@@ -203,26 +225,41 @@ def dashboard(request):
 
 @login_required
 def lead_kanban(request):
+<<<<<<< HEAD
     # Agora todos os status, inclusive os dois de visita agendada separadamente!
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     status_list = [
         ('lead_novo', 'Lead Novo'),
         ('contato', 'Contato Feito'),
         ('visita', 'Visita Agendada'),
+<<<<<<< HEAD
         ('VISITA_AGENDADA_COMPARECEU', 'Visita Agendada - Compareceu'),
         ('VISITA_AGENDADA_FALTOU', 'Visita Agendada - Faltou'),
         ('matricula', 'Matriculado'),
         ('perdido', 'Perdido'),
     ]
+=======
+        ('matricula', 'Matriculado'),
+        ('perdido', 'Perdido'),
+    ]
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     status_dict = dict(status_list)
 
     status_colors = {
         'Lead Novo': 'bg-primary',
         'Contato Feito': 'bg-info',
         'Visita Agendada': 'bg-warning',
+<<<<<<< HEAD
         'Visita Agendada - Compareceu': 'bg-success',
         'Visita Agendada - Faltou': 'bg-danger',
         'Matriculado': 'bg-primary',
         'Perdido': 'bg-dark',
+=======
+        'Matriculado': 'bg-success',
+        'Perdido': 'bg-danger',
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     }
 
     busca = request.GET.get('busca') or ''
@@ -231,11 +268,19 @@ def lead_kanban(request):
 
     for status_code, status_name in status_list:
         leads = Lead.objects.filter(status=status_code)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
         if busca:
             leads = leads.filter(
                 Q(nome_cliente__icontains=busca) |
                 Q(telefone_cliente__icontains=busca)
             )
+<<<<<<< HEAD
+=======
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
         status_leads[status_name] = leads.order_by('-data_inicio_atendimento')[:50]
 
     return render(request, 'lead_kanban.html', {
@@ -244,7 +289,11 @@ def lead_kanban(request):
         'status_list': status_list,
         'status_dict': status_dict,
         'busca': busca,
+<<<<<<< HEAD
     })  
+=======
+    })
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 
 @csrf_exempt
 def mover_lead(request):
@@ -303,12 +352,20 @@ def exportar_leads_csv(request):
 
     writer = csv.writer(response)
     writer.writerow(['Nome', 'Telefone', 'Curso', 'Status', 'Atendente', 'Data de Início'])
+<<<<<<< HEAD
     cursos_nomes = ', '.join([c.nome for c in lead.cursos_interesse.all()]),
+=======
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     for lead in leads:
         writer.writerow([
             lead.nome_cliente,
             lead.telefone_cliente,
+<<<<<<< HEAD
             lead.cursos_nomes,
+=======
+            lead.curso_interesse,
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
             lead.get_status_display(),
             lead.atendente.username if lead.atendente else 'Sem Atendente',
             lead.data_inicio_atendimento.strftime('%d/%m/%Y %H:%M') if lead.data_inicio_atendimento else '',
@@ -340,6 +397,7 @@ def lead_detail(request, pk):
         'observacoes': observacoes,
         'form': form
     })
+<<<<<<< HEAD
 
 @csrf_exempt
 def webhook_google_sheets(request):
@@ -493,3 +551,5 @@ def lead_update(request, pk):
     else:
         form = LeadForm(instance=lead)
     return render(request, 'lead_form.html', {'form': form})
+=======
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+<<<<<<< HEAD
 {% load form_filters %}
 {% load form_filters %}
 
@@ -55,11 +56,66 @@
 <div id="kanbanFullscreenModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; overflow:auto; padding:24px;">
   <button onclick="fecharKanbanFullscreen()" class="btn btn-danger mb-3">❌ Fechar Tela Cheia</button>
   <div id="kanbanFullscreenContent"></div>
+=======
+{% load dict_filters %}
+
+{% block content %}
+<h2 class="mb-3">🗂️ Quadro Kanban de Leads</h2>
+
+<!-- Filtro de Busca -->
+<form method="get" class="kanban-filtro mb-3">
+    <input type="text" name="busca" placeholder="🔎 Buscar por nome ou telefone..." value="{{ busca }}" class="form-control w-25">
+    <button type="submit" class="btn btn-outline-primary">Filtrar</button>
+    <button type="button" onclick="abrirKanbanFullscreen()" class="btn btn-outline-secondary ms-2">🖥️ Tela Cheia</button>
+</form>
+
+<div class="kanban-board shadow-sm">
+    {% for status, leads in status_leads.items %}
+        <div class="kanban-column" data-status="{{ status_list|get_status_code:status }}">
+            <div class="card">
+                <div class="card-header text-white fw-bold {{ status_colors|dict_get:status }}">
+                    {{ status }} ({{ leads|length }})
+                </div>
+                <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
+                    {% for lead in leads %}
+                        <div class="lead-card shadow-sm mb-2" draggable="true" data-lead-id="{{ lead.id }}">
+                            <div class="card-body p-2" onclick="toggleDetails({{ lead.id }})" style="cursor: pointer;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>{{ lead.nome_cliente }}</strong>
+                                    <span class="badge bg-secondary">{{ lead.get_status_display }}</span>
+                                </div>
+                                <small class="text-muted">📞 {{ lead.telefone_cliente }}</small>
+                            </div>
+
+                            <div id="details-{{ lead.id }}" style="display: none; padding: 8px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
+                                <p>🎓 <strong>Curso:</strong> {{ lead.curso_interesse }}</p>
+                                <p>👤 <strong>Atendente:</strong> {{ lead.atendente }}</p>
+                                <p>📅 <strong>Cadastro:</strong> {{ lead.data_cadastro|date:"d/m/Y" }}</p>
+                                <p>🕑 <strong>Início:</strong> {{ lead.data_inicio_atendimento|date:"d/m/Y H:i" }}</p>
+                                <a href="{% url 'lead_update' lead.pk %}" class="btn btn-sm btn-outline-primary">✏️ Editar</a>
+                                <a href="{% url 'lead_detail' lead.pk %}" class="btn btn-sm btn-info">🔍 Detalhes</a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">Nenhum lead nesta etapa.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Fullscreen Modal -->
+<div id="kanbanFullscreenModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; overflow:auto; padding:20px;">
+    <button onclick="fecharKanbanFullscreen()" class="btn btn-danger mb-3">❌ Fechar Tela Cheia</button>
+    <div id="kanbanFullscreenContent"></div>
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 </div>
 
 <script>
 const csrfToken = '{{ csrf_token }}';
 
+<<<<<<< HEAD
 function bindDragDrop(context) {
   const cards = context.querySelectorAll('.lead-card');
   const columns = context.querySelectorAll('.kanban-column');
@@ -155,10 +211,146 @@ function fecharKanbanFullscreen() {
         flex: 0 0 92vw;
     }
 }
+=======
+// Drag and Drop
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.lead-card');
+    const columns = document.querySelectorAll('.kanban-column');
+
+    cards.forEach(card => {
+        card.draggable = true;
+        card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('lead_id', card.dataset.leadId);
+        });
+    });
+
+    columns.forEach(column => {
+        column.addEventListener('dragover', (e) => e.preventDefault());
+
+        column.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const leadId = e.dataTransfer.getData('lead_id');
+            const novoStatus = column.dataset.status;
+
+            fetch('/mover-lead/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `lead_id=${leadId}&novo_status=${novoStatus}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro ao mover lead: ' + data.error);
+                }
+            });
+        });
+    });
+});
+
+// Expandir/Colapsar detalhes
+function toggleDetails(leadId) {
+    const detailsDiv = document.getElementById('details-' + leadId);
+    if (detailsDiv.style.display === 'none') {
+        detailsDiv.style.display = 'block';
+    } else {
+        detailsDiv.style.display = 'none';
+    }
+}
+
+// Fullscreen Kanban
+function abrirKanbanFullscreen() {
+    const kanbanBoard = document.querySelector('.kanban-board');
+    const modalContent = document.getElementById('kanbanFullscreenContent');
+
+    // Copiando TUDO, incluindo a estrutura da board (não só innerHTML)
+    modalContent.innerHTML = '';
+    const clone = kanbanBoard.cloneNode(true);
+    modalContent.appendChild(clone);
+
+    // Reativar eventos nos cards dentro da modal (exemplo: clique no detalhe)
+    modalContent.querySelectorAll('.lead-card').forEach(card => {
+        card.addEventListener('click', () => {
+            alert('📝 Aqui abriria o detalhe/edição rápida do Lead ID: ' + card.dataset.leadId);
+        });
+    });
+
+    document.getElementById('kanbanFullscreenModal').style.display = 'block';
+}
+
+function fecharKanbanFullscreen() {
+    document.getElementById('kanbanFullscreenModal').style.display = 'none';
+}
+</script>
+
+
+<style>
+.kanban-board {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.kanban-column {
+    flex: 0 0 260px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.kanban-column .card-header {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+}
+
+.lead-card {
+    transition: 0.2s;
+    cursor: grab;
+}
+
+.lead-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.kanban-filtro input {
+    max-width: 300px;
+}
+#kanbanFullscreenModal .kanban-board {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 16px;
+    padding: 10px;
+    background-color: #f1f3f5;
+}
+
+#kanbanFullscreenModal .kanban-column {
+    flex: 0 0 260px;
+    max-height: none;
+}
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 #kanbanFullscreenModal button {
     position: sticky;
     top: 10px;
     z-index: 10000;
 }
+<<<<<<< HEAD
 </style>
+=======
+
+</style>
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 {% endblock %}

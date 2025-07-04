@@ -54,23 +54,36 @@
 
         <!-- Lista -->
         <table class="table table-hover table-striped small">
+<<<<<<< HEAD
                 <thead>
+=======
+            <thead class="table-light">
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Telefone</th>
                     <th>Status</th>
                     <th>Atendente</th>
+<<<<<<< HEAD
                     <th>Cursos</th>    <!-- nova coluna -->
                     <th>Ações</th>
                 </tr>
                 </thead>
                 <tbody>
+=======
+                    <th>Curso de Interesse</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
                 {% for lead in page_obj %}
                 <tr>
                     <td>{{ lead.id }}</td>
                     <td>{{ lead.nome_cliente }}</td>
                     <td>{{ lead.telefone_cliente }}</td>
+<<<<<<< HEAD
                     <td>{{ lead.get_status_display }}</td>
                     <td>{{ lead.atendente.username }}</td>
                     <td>
@@ -80,6 +93,11 @@
                         — 
                     {% endfor %}
                     </td>
+=======
+                    <td><span class="text-dark fw-bold">{{ lead.get_status_display }}</span></td>
+                    <td>{{ lead.atendente.username }}</td>
+                    <td>{{ lead.curso_interesse }}</td>
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
                     <td class="d-flex gap-1">
                         <a href="{% url 'lead_detail' lead.pk %}" class="btn btn-outline-secondary btn-sm">🔍 Detalhes</a>
                         <a href="{% url 'lead_update' lead.pk %}" class="btn btn-outline-primary btn-sm">✏️ Editar</a>

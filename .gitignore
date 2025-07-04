@@ -19,3 +19,4 @@ env/
 *.DS_Store
 *.bak
 *.swp
+credencial_google.json

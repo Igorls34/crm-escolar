@@ -9,9 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -------------------
 SECRET_KEY = os.getenv('SECRET_KEY', '5b5df44c25f6dc1e9202eaa4dc6a706e')
 
+<<<<<<< HEAD
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+=======
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 
 # -------------------
 # Apps instalados
@@ -23,7 +29,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'core.apps.CoreConfig',
+=======
+    'core',
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
     'django.contrib.humanize',
 ]
 
@@ -48,7 +58,11 @@ ROOT_URLCONF = 'crm_escolar.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+<<<<<<< HEAD
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
+=======
+        'DIRS': [],
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,6 +79,7 @@ WSGI_APPLICATION = 'crm_escolar.wsgi.application'
 # -------------------
 # Banco de Dados
 # -------------------
+<<<<<<< HEAD
 # -------------------
 # Banco de Dados (LOCAL)
 # -------------------
@@ -74,6 +89,12 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+=======
+DATABASES = {
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+}
+
+>>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 # -------------------
 # Validação de senha
 # -------------------
