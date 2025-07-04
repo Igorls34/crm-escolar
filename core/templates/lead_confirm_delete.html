@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-<<<<<<< HEAD
 {% block title %}Excluir Lead | CRM Escolar{% endblock %}
 
 {% block content %}
@@ -31,29 +30,5 @@
       </div>
     </div>
   </div>
-=======
-{% block content %}
-<div class="card shadow-sm">
-    <div class="card-header bg-danger text-white">
-        <h4 class="mb-0">Confirmação de Exclusão</h4>
-    </div>
-
-    <div class="card-body">
-        <p>Tem certeza que deseja excluir o lead abaixo?</p>
-
-        <ul>
-            <li><strong>Nome:</strong> {{ lead.nome_cliente }}</li>
-            <li><strong>Telefone:</strong> {{ lead.telefone_cliente }}</li>
-            <li><strong>Curso de Interesse:</strong> {{ lead.curso_interesse }}</li>
-            <li><strong>Status:</strong> {{ lead.get_status_display }}</li>
-        </ul>
-
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Sim, excluir</button>
-            <a href="{% url 'lead_list' %}" class="btn btn-secondary">Cancelar</a>
-        </form>
-    </div>
->>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
 </div>
 {% endblock %}

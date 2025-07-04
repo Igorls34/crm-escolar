@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-<<<<<<< HEAD
 {% block title %}Detalhes do Lead | CRM Escolar{% endblock %}
 
 {% block content %}
@@ -79,46 +78,3 @@
 </div>
 {% endblock %}
 
-=======
-{% block content %}
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">👤 Detalhes do Lead - {{ lead.nome_cliente }}</h4>
-        <a href="{% url 'lead_update' lead.pk %}" class="btn btn-light btn-sm">✏️ Editar Lead</a>
-    </div>
-
-    <div class="card-body">
-        <p><strong>📞 Telefone:</strong> {{ lead.telefone_cliente }}</p>
-        <p><strong>🎓 Curso de Interesse:</strong> {{ lead.curso_interesse }}</p>
-        <p><strong>🗓️ Data de Início de Atendimento:</strong> {{ lead.data_inicio_atendimento|date:"d/m/Y H:i" }}</p>
-        <p><strong>👤 Atendente:</strong> {{ lead.atendente }}</p>
-        <p><strong>🏷️ Status Atual:</strong> {{ lead.get_status_display }}</p>
-    </div>
-</div>
-
-<div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white">
-        <h5 class="mb-0">📜 Histórico de Observações</h5>
-    </div>
-
-    <div class="card-body">
-        {% if observacoes %}
-            <ul class="list-group">
-                {% for obs in observacoes %}
-                    <li class="list-group-item">
-                        <p>{{ obs.texto }}</p>
-                        <small class="text-muted">Adicionado em: {{ obs.criado_em|date:"d/m/Y H:i" }}</small>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-muted">Nenhuma observação registrada ainda.</p>
-        {% endif %}
-    </div>
-</div>
-
-<div class="mt-3">
-    <a href="{% url 'lead_list' %}" class="btn btn-outline-secondary">← Voltar para a Lista</a>
-</div>
-{% endblock %}
->>>>>>> 87dd47473da2f5106596a68cfea294ccf720d0c4
