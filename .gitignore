@@ -21,3 +21,5 @@ env/
 *.swp
 credencial_google.jsoncredencial_google.json
 credencial_google.json
+"db.sqlite3" 
+"__pycache__/" 
