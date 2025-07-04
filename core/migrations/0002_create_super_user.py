@@ -7,7 +7,7 @@ def create_super_user(apps, schema_editor):
         User.objects.create_superuser(
             username='Igor',
             email='igorlaurindo49@gmail.com',
-            password='123'
+            password='INTERATECH'
         )
 
 class Migration(migrations.Migration):
