@@ -148,8 +148,8 @@ def lead_report(request):
     # Contagem por Curso de Interesse
     cursos_counts = Lead.objects.values('cursos_interesse__nome').annotate(total=Count('id'))
     cursos_labels = [item['cursos_interesse__nome'] or 'Não informado' for item in cursos_counts]
-    cursos_counts = Lead.objects.values('curso_interesse').annotate(total=Count('id'))
-    cursos_labels = [item['curso_interesse'] for item in cursos_counts]
+    cursos_counts = Lead.objects.values('cursos_interesse').annotate(total=Count('id'))
+    cursos_labels = [item['cursos_interesse'] for item in cursos_counts]
     cursos_data = [item['total'] for item in cursos_counts]
 
     # Funil de Conversão
