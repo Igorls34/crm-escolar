@@ -215,8 +215,7 @@ from django.db.models import Count
 
 @login_required
 def lead_kanban(request):
-    # Se for POST, é o drop do JS
-    if request.method == "POST" and request.is_ajax():
+    if request.method == "POST":
         lead_id      = request.POST.get("lead_id")
         novo_status  = request.POST.get("novo_status")
         try:

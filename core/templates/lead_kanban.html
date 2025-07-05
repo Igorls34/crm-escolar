@@ -31,7 +31,7 @@
               </div>
               <small class="text-muted">📞 {{ lead.telefone_cliente }}</small>
             </div>
-            <div id="details-{{ lead.id }}" class="lead-details card-body p-2 mt-2 bg-light rounded-3" style="display:none; padding:8px; background:#f8f9fa; border-top:1px solid #dee2e6;">
+            <div id="details-{{ lead.id }}" class="lead-details card-body p-2 mt-2 bg-light rounded-3" style="display:none;">
               <p>🎓 <strong>Curso:</strong> {{ lead.cursos_interesse }}</p>
               <p>👤 <strong>Atendente:</strong> {{ lead.atendente }}</p>
               <p>📅 <strong>Cadastro:</strong> {{ lead.data_cadastro|date:"d/m/Y" }}</p>
@@ -57,7 +57,6 @@
 </div>
 
 <script>
-// token CSRF gerado pelo Django
 const csrfToken = '{{ csrf_token }}';
 
 function bindDragDrop(context) {
@@ -100,11 +99,8 @@ function bindDragDrop(context) {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          // move DOM element sem reload
           const card = document.querySelector(`[data-lead-id="${leadId}"]`);
-          const list = column.querySelector('.card-body');
-          list.appendChild(card);
-          // atualiza badges
+          column.querySelector('.card-body').appendChild(card);
           document.querySelectorAll('.kanban-column').forEach(col => {
             const badge = col.querySelector('.card-header .badge');
             badge.textContent = col.querySelectorAll('.lead-card').length;
@@ -119,12 +115,12 @@ function bindDragDrop(context) {
   });
 }
 
-function toggleDetails(leadId) {
-  const detailsDiv = document.getElementById('details-' + leadId);
-  detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
-}
-
 document.addEventListener('DOMContentLoaded', () => bindDragDrop(document));
+
+function toggleDetails(leadId) {
+  const d = document.getElementById('details-' + leadId);
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
 
 function abrirKanbanFullscreen() {
   const modal = document.getElementById('kanbanFullscreenModal');
@@ -142,49 +138,13 @@ function fecharKanbanFullscreen() {
 </script>
 
 <style>
-.kanban-board {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 20px;
-    border-radius: 18px;
-    background: linear-gradient(97deg, #e9ecef 80%, #f8f9fa 100%);
-    min-height: 82vh;
-}
-.kanban-column {
-    flex: 0 0 295px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 3px 14px 2px #2125290f;
-    padding: 0 3px 5px 3px;
-    display: flex;
-    flex-direction: column;
-    max-height: 82vh;
-}
-.kanban-column.drag-over {
-    background: #f1f3f5;
-}
-.kanban-column .card-body {
-    flex: 1;
-}
-.lead-card {
-    cursor: grab;
-}
-.lead-card:active {
-    cursor: grabbing;
-}
-@media (max-width: 900px) {
-    .kanban-board, #kanbanFullscreenModal .kanban-board {
-        gap: 10px;
-    }
-    .kanban-column, #kanbanFullscreenModal .kanban-column {
-        flex: 0 0 92vw;
-    }
-}
-#kanbanFullscreenModal button {
-    position: sticky;
-    top: 10px;
-    z-index: 10000;
-}
+.kanban-board { display:flex; gap:20px; overflow-x:auto; padding-bottom:20px; background:linear-gradient(97deg,#e9ecef 80%,#f8f9fa 100%); min-height:82vh; }
+.kanban-column { flex:0 0 295px; background:#fff; border-radius:18px; box-shadow:0 3px 14px 2px #2125290f; display:flex; flex-direction:column; }
+.kanban-column.drag-over { background:#f1f3f5; }
+.kanban-column .card-body { flex:1; }
+.lead-card { cursor:grab; }
+.lead-card:active { cursor:grabbing; }
+@media(max-width:900px){.kanban-column{flex:0 0 92vw;}}
+#kanbanFullscreenModal button{position:sticky; top:10px; z-index:10000;}
 </style>
 {% endblock %}
