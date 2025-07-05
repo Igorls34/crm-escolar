@@ -1,0 +1,25 @@
+# Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+*.log
+
+# Virtualenv
+venv/
+env/
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# Sistema
+*.DS_Store
+*.bak
+*.swp
+credencial_google.jsoncredencial_google.json
+credencial_google.json
+"db.sqlite3" 
+"__pycache__/" 
