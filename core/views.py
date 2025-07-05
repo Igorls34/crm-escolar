@@ -206,50 +206,45 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', context)
 
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render
+from .models import Lead
+from .templatetags.dict_filters import dict_get
+from django.db.models import Count
+
 @login_required
 def lead_kanban(request):
-    # Agora todos os status, inclusive os dois de visita agendada separadamente!
-    status_list = [
-        ('lead_novo', 'Lead Novo'),
-        ('contato', 'Contato Feito'),
-        ('visita', 'Visita Agendada'),
-        ('VISITA_AGENDADA_COMPARECEU', 'Visita Agendada - Compareceu'),
-        ('VISITA_AGENDADA_FALTOU', 'Visita Agendada - Faltou'),
-        ('matricula', 'Matriculado'),
-        ('perdido', 'Perdido'),
-    ]
-    status_dict = dict(status_list)
-
-    status_colors = {
-        'Lead Novo': 'bg-primary',
-        'Contato Feito': 'bg-info',
-        'Visita Agendada': 'bg-warning',
-        'Visita Agendada - Compareceu': 'bg-success',
-        'Visita Agendada - Faltou': 'bg-danger',
-        'Matriculado': 'bg-primary',
-        'Perdido': 'bg-dark',
+    # Se for POST, é o drop do JS
+    if request.method == "POST" and request.is_ajax():
+        lead_id      = request.POST.get("lead_id")
+        novo_status  = request.POST.get("novo_status")
+        try:
+            lead = Lead.objects.get(pk=lead_id)
+            lead.status = novo_status
+            lead.save()
+            return JsonResponse({"success": True})
+        except Lead.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Lead não encontrado"})
+    
+    # Caso contrário, GET: monta o board
+    status_list    = Lead.STATUS_CHOICES  # ou de onde você carrega
+    status_colors  = {display: css for code, display, css in ...}  # como estiver
+    busca          = request.GET.get("busca", "")
+    all_leads      = Lead.objects.filter(
+                        nome_cliente__icontains=busca
+                    ).order_by("data_cadastro")  # evite UnorderedObjectListWarning
+    status_leads   = {
+        name: all_leads.filter(status=code)
+        for code, name in status_list
     }
 
-    busca = request.GET.get('busca') or ''
-
-    status_leads = {}
-
-    for status_code, status_name in status_list:
-        leads = Lead.objects.filter(status=status_code)
-        if busca:
-            leads = leads.filter(
-                Q(nome_cliente__icontains=busca) |
-                Q(telefone_cliente__icontains=busca)
-            )
-        status_leads[status_name] = leads.order_by('-data_inicio_atendimento')[:50]
-
-    return render(request, 'lead_kanban.html', {
-        'status_leads': status_leads,
-        'status_colors': status_colors,
-        'status_list': status_list,
-        'status_dict': status_dict,
-        'busca': busca,
-    })  
+    return render(request, "lead_kanban.html", {
+        "status_list":    [(code, name) for code, name in status_list],
+        "status_colors":  status_colors,
+        "status_leads":   status_leads,
+        "busca":          busca,
+    })
 
 @csrf_exempt
 def mover_lead(request):
