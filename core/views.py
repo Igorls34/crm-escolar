@@ -123,64 +123,69 @@ def lead_delete(request, pk):
 
 @login_required
 def lead_report(request):
-    total_leads = Lead.objects.count()
+    # Métricas básicas
+    total_leads        = Lead.objects.count()
     total_matriculados = Lead.objects.filter(status='matricula').count()
-    taxa_conversao = (total_matriculados / total_leads * 100) if total_leads > 0 else 0
+    taxa_conversao     = (total_matriculados / total_leads * 100) if total_leads else 0
 
-    sete_dias_atras = now() - timedelta(days=7)
-    trinta_dias_atras = now() - timedelta(days=30)
+    # Intervalos de tempo
+    sete_dias_atras     = now() - timedelta(days=7)
+    trinta_dias_atras   = now() - timedelta(days=30)
+    leads_7_dias        = Lead.objects.filter(data_inicio_atendimento__gte=sete_dias_atras).count()
+    leads_30_dias       = Lead.objects.filter(data_inicio_atendimento__gte=trinta_dias_atras).count()
+    ultimo_lead         = Lead.objects.order_by('-data_inicio_atendimento').first()
 
-    leads_ultimos_7_dias = Lead.objects.filter(data_inicio_atendimento__gte=sete_dias_atras).count()
-    leads_ultimo_mes = Lead.objects.filter(data_inicio_atendimento__gte=trinta_dias_atras).count()
-
-    ultimo_lead = Lead.objects.order_by('-data_inicio_atendimento').first()
-
-    # Contagem por Status
+    # Gráficos: Status
     status_counts = Lead.objects.values('status').annotate(total=Count('status'))
     status_labels = [item['status'] for item in status_counts]
-    status_data = [item['total'] for item in status_counts]
+    status_data   = [item['total']  for item in status_counts]
 
-    # Contagem por Atendente
+    # Gráficos: Atendente
     atendente_counts = Lead.objects.values('atendente__username').annotate(total=Count('id'))
-    atendente_labels = [item['atendente__username'] if item['atendente__username'] else 'Sem Atendente' for item in atendente_counts]
+    atendente_labels = [
+        item['atendente__username'] or 'Sem Atendente'
+        for item in atendente_counts
+    ]
     atendente_data = [item['total'] for item in atendente_counts]
 
-    # Contagem por Curso de Interesse
-    cursos_counts = Lead.objects.values('cursos_interesse__nome').annotate(total=Count('id'))
-    cursos_labels = [item['cursos_interesse__nome'] or 'Não informado' for item in cursos_counts]
-    cursos_counts = Lead.objects.values('cursos_interesse').annotate(total=Count('id'))
-    cursos_labels = [item['cursos_interesse'] for item in cursos_counts]
+    # Gráficos: Cursos de Interesse
+    cursos_counts = (
+        Lead.objects
+            .values('cursos_interesse__nome')
+            .annotate(total=Count('id'))
+    )
+    cursos_labels = [
+        item['cursos_interesse__nome'] or 'Não informado'
+        for item in cursos_counts
+    ]
     cursos_data = [item['total'] for item in cursos_counts]
 
-    # Funil de Conversão
+    # Funil de conversão
     funil_data = [
         total_leads,
         Lead.objects.filter(status='contato').count(),
         Lead.objects.filter(status='visita').count(),
-        total_matriculados
+        total_matriculados,
     ]
 
     context = {
-        'total_leads': total_leads,
-        'taxa_conversao': taxa_conversao,
-        'leads_ultimos_7_dias': leads_ultimos_7_dias,
-        'leads_ultimo_mes': leads_ultimo_mes,
-        'ultimo_lead': ultimo_lead,
+        'total_leads':        total_leads,
+        'taxa_conversao':     taxa_conversao,
+        'leads_ultimos_7_dias': leads_7_dias,
+        'leads_ultimo_mes':     leads_30_dias,
+        'ultimo_lead':          ultimo_lead,
 
-        'status_counts': status_counts,
-        'status_labels': json.dumps(status_labels),
-        'status_data': json.dumps(status_data),
+        'status_labels':   json.dumps(status_labels),
+        'status_data':     json.dumps(status_data),
 
-        'atendente_counts': atendente_counts,
         'atendente_labels': json.dumps(atendente_labels),
-        'atendente_data': json.dumps(atendente_data),
+        'atendente_data':   json.dumps(atendente_data),
 
-        'cursos_labels': json.dumps(cursos_labels),
-        'cursos_data': json.dumps(cursos_data),
+        'cursos_labels':   json.dumps(cursos_labels),
+        'cursos_data':     json.dumps(cursos_data),
 
-        'funil_data': json.dumps(funil_data),
+        'funil_data':      json.dumps(funil_data),
     }
-
     return render(request, 'lead_report.html', context)
 
 @login_required
@@ -206,43 +211,37 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', context)
 
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import render
-from .models import Lead
-from .templatetags.dict_filters import dict_get
-from django.db.models import Count
-
 @login_required
 def lead_kanban(request):
+    # trata o POST do drag-and-drop
     if request.method == "POST":
-        lead_id      = request.POST.get("lead_id")
-        novo_status  = request.POST.get("novo_status")
-        try:
-            lead = Lead.objects.get(pk=lead_id)
-            lead.status = novo_status
-            lead.save()
-            return JsonResponse({"success": True})
-        except Lead.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Lead não encontrado"})
-    
-    # Caso contrário, GET: monta o board
-    status_list    = Lead.STATUS_CHOICES  # ou de onde você carrega
-    status_colors  = {display: css for code, display, css in ...}  # como estiver
-    busca          = request.GET.get("busca", "")
-    all_leads      = Lead.objects.filter(
-                        nome_cliente__icontains=busca
-                    ).order_by("data_cadastro")  # evite UnorderedObjectListWarning
-    status_leads   = {
-        name: all_leads.filter(status=code)
-        for code, name in status_list
+        lead_id     = request.POST.get("lead_id")
+        novo_status = request.POST.get("novo_status")
+        lead = get_object_or_404(Lead, pk=lead_id)
+        lead.status = novo_status
+        lead.save()
+        return JsonResponse({"success": True})
+
+    # GET: monta o board
+    status_list = Lead.STATUS_CHOICES  # e.g. [('novo','Novo'),('em_atendimento','Em Atendimento'),...]
+    status_colors = {
+        'Novo':           'bg-primary',
+        'Em Atendimento': 'bg-warning',
+        'Convertido':     'bg-success',
+        'Perdido':        'bg-danger',
+    }
+    busca     = request.GET.get("busca", "")
+    all_leads = Lead.objects.filter(nome_cliente__icontains=busca).order_by("data_cadastro")
+    status_leads = {
+        display: all_leads.filter(status=code)
+        for code, display in status_list
     }
 
     return render(request, "lead_kanban.html", {
-        "status_list":    [(code, name) for code, name in status_list],
-        "status_colors":  status_colors,
-        "status_leads":   status_leads,
-        "busca":          busca,
+        "status_list":   status_list,
+        "status_colors": status_colors,
+        "status_leads":  status_leads,
+        "busca":         busca,
     })
 
 @csrf_exempt
